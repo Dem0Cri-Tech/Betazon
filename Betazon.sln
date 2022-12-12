@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33122.133
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betazon", "Betazon\Betazon.csproj", "{1F3763C8-18CF-4706-9843-FC26576B2AC4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F3763C8-18CF-4706-9843-FC26576B2AC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F3763C8-18CF-4706-9843-FC26576B2AC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F3763C8-18CF-4706-9843-FC26576B2AC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F3763C8-18CF-4706-9843-FC26576B2AC4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2F50A400-001D-4EF6-8EEF-C665597B3792}
+	EndGlobalSection
+EndGlobal
