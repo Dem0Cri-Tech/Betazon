@@ -86,4 +86,6 @@ public partial class Customer
     public virtual ICollection<CustomerAddress> CustomerAddresses { get; } = new List<CustomerAddress>();
 
     public virtual ICollection<SalesOrderHeader> SalesOrderHeaders { get; } = new List<SalesOrderHeader>();
+
+    public virtual ICollection<Credentials> Credentials { get; } = new List<Credentials>();
 }
