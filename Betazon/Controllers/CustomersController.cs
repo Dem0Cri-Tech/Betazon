@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Betazon.Models;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Options;
+using Hashing;
 
 namespace Betazon.Controllers
 {
@@ -16,6 +17,7 @@ namespace Betazon.Controllers
     public class CustomersController : ControllerBase
     {
         private readonly AdventureWorksLt2019Context _context;
+        private Encrypt _encrypt;
 
         public CustomersController(AdventureWorksLt2019Context context)
         {
@@ -112,14 +114,29 @@ namespace Betazon.Controllers
         [HttpPost]
         public async Task<ActionResult<Customer>> PostCustomer(Customer customer)
         {
-          if (_context.Customers == null)
-          {
-              return Problem("Entity set 'AdventureWorksLt2019Context.Customers'  is null.");
-          }
-            _context.Customers.Add(customer);
-            await _context.SaveChangesAsync();
+            using var transaction = _context.Database.BeginTransaction();
 
-            return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
+            try
+            {
+                if (_context.Customers == null)
+                {
+                    return Problem("Entity set 'AdventureWorksLt2019Context.Customers'  is null.");
+                }
+                customer.PasswordSalt = _encrypt.SaltGenerator();
+                customer.PasswordHash = _encrypt.Hash(customer.PasswordHash, customer.PasswordSalt);
+
+                _context.Customers.Add(customer);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
+            }
+            catch (Exception e) 
+            {
+                
+                _context.ErrorLogs.FromSql($"uspLogError {0}");
+                transaction.Rollback();
+                return Problem("Error During insert on Customer table");
+            }
         }
 
         // DELETE: api/Customers/5

@@ -89,6 +89,8 @@ namespace Betazon.Controllers
           {
               return Problem("Entity set 'AdventureWorksLt2019Context.Credentials'  is null.");
           }
+            credentials.Role = 0;   // Role 0 = customer
+           
             _context.Credentials.Add(credentials);
             await _context.SaveChangesAsync();
 
