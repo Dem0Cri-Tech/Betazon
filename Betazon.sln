@@ -5,6 +5,8 @@ VisualStudioVersion = 17.4.33122.133
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Betazon", "Betazon\Betazon.csproj", "{1F3763C8-18CF-4706-9843-FC26576B2AC4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hashing", "Hashing\Hashing.csproj", "{269D722C-FB6C-4CA8-9B47-27C64F897AE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{1F3763C8-18CF-4706-9843-FC26576B2AC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F3763C8-18CF-4706-9843-FC26576B2AC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1F3763C8-18CF-4706-9843-FC26576B2AC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{269D722C-FB6C-4CA8-9B47-27C64F897AE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{269D722C-FB6C-4CA8-9B47-27C64F897AE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{269D722C-FB6C-4CA8-9B47-27C64F897AE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{269D722C-FB6C-4CA8-9B47-27C64F897AE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
