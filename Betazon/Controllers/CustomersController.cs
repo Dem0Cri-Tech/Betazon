@@ -52,7 +52,7 @@ namespace Betazon.Controllers
         }
 
         // GET: api/Customers/5
-        [Authorize]
+        [Authorize(Roles ="2")]
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
@@ -82,45 +82,7 @@ namespace Betazon.Controllers
            
         }
 
-        // GET: api/Customers/Products/email
         
-        [HttpGet("Products/{email}")]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(string email)
-        {
-            List<Product> products=new List<Product>();
-
-            if (_context.Customers == null)
-            {
-                return NotFound();
-            }
-            using (var context = _context)
-            {
-                var customer = await context.Customers
-                   .AsNoTracking()
-                   .Where(customer => customer.EmailAddress == email && customer.SalesOrderHeaders.Count != 0)
-                   .Include(customer => customer.SalesOrderHeaders)
-                   .ThenInclude(salesOrderHeaders => salesOrderHeaders.SalesOrderDetails)
-                   .ThenInclude(salesOrderDetails => salesOrderDetails.Product)
-                   .FirstOrDefaultAsync();
-                   
-
-                if (customer == null)
-                {
-                    return NotFound();
-                }
-
-                foreach(SalesOrderHeader salesOrderHeader in customer.SalesOrderHeaders)
-                {
-                    foreach(SalesOrderDetail salesOrderDetail in salesOrderHeader.SalesOrderDetails)
-                    {
-                        products.Add(salesOrderDetail.Product);
-                    }
-                }
-
-                return products;
-            }
-
-        }
 
         // PUT: api/Customers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

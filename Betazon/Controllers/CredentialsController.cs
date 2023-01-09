@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Betazon.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Betazon.Controllers
 {
@@ -21,6 +22,7 @@ namespace Betazon.Controllers
         }
 
         // GET: api/Credentials
+        [Authorize ]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Credentials>>> GetCredentials()
         {
@@ -32,6 +34,7 @@ namespace Betazon.Controllers
         }
 
         // GET: api/Credentials/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Credentials>> GetCredentials(int id)
         {
@@ -51,6 +54,7 @@ namespace Betazon.Controllers
 
         // PUT: api/Credentials/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [Authorize(Roles ="2")]
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCredentials(int id, Credentials credentials)
         {
@@ -100,6 +104,7 @@ namespace Betazon.Controllers
         }
 
         // DELETE: api/Credentials/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCredentials(int id)
         {
