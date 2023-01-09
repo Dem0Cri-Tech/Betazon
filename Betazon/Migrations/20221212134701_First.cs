@@ -11,7 +11,7 @@ namespace Betazon.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            /*
+            
             migrationBuilder.EnsureSchema(
                 name: "SalesLT");
 
@@ -529,7 +529,7 @@ namespace Betazon.Migrations
                 schema: "SalesLT",
                 table: "SalesOrderHeader",
                 column: "ShipToAddressID");
-            */
+            
         }
 
         /// <inheritdoc />
