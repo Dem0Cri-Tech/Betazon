@@ -6,11 +6,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Options;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// UTILE PER IL CORS
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+// Vecchio CORS
+//var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
 // Add services to the container.
 
@@ -18,9 +21,35 @@ builder.Services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.Re
 
 builder.Services.AddDbContext<AdventureWorksLt2019Context>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("WebAspNetDB")));
 
+builder.Services.AddAuthentication(opt => {
+    opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = "https://localhost:7157",
+            ValidAudience = "https://localhost:7157",
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetSection("SecretKey")["Key"]))
+        };
+        /* This is the implementation to receive the token through httponly cookie
+         * options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                context.Token = context.Request.Cookies["access_token"];
+                return Task.CompletedTask;
+            }
+        };*/
+    });
 
-//UTILE PER IL CORS
-builder.Services.AddCors(options =>
+//Vecchio CORS
+/*builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
                       policy =>
@@ -29,6 +58,17 @@ builder.Services.AddCors(options =>
                           .AllowAnyMethod()
                           .AllowAnyHeader();
                       });
+});*/
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("EnableCORS", builder =>
+    {
+        builder.WithOrigins("http://localhost:4200")
+        
+        .AllowAnyHeader()
+        .AllowAnyMethod();
+    });
 });
 
 var app = builder.Build();
@@ -37,10 +77,13 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
+app.UseCors("EnableCORS");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
-// UTILE PER IL CORS
-app.UseCors(MyAllowSpecificOrigins);
+// Vecchio CORS
+//app.UseCors(MyAllowSpecificOrigins);
 
 app.MapControllers();
 

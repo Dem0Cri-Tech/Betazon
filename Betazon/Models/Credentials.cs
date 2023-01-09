@@ -37,7 +37,7 @@ namespace Betazon.Models
         /// Record customer collegato alla tabella user
         /// </summary>
         [ForeignKey("CustomerId")]
-        public virtual Customer customer { get; set; } = null!;
+        public virtual Customer? customer { get; set; } 
 
         public virtual ICollection<UserLog> UserLogs { get; } = new List<UserLog>();
 

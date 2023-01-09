@@ -9,6 +9,7 @@ using Betazon.Models;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Options;
 using Hashing;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Betazon.Controllers
 {
@@ -21,11 +22,13 @@ namespace Betazon.Controllers
 
         public CustomersController(AdventureWorksLt2019Context context)
         {
+            _encrypt = new Encrypt();
             _context = context;
         }
 
         // GET: api/Customers
         [HttpGet]
+        [Authorize(Roles = "2")]
         public async Task<ActionResult<IEnumerable<Customer>>> GetCustomers()
         {
           if (_context.Customers == null)
@@ -49,6 +52,7 @@ namespace Betazon.Controllers
         }
 
         // GET: api/Customers/5
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<Customer>> GetCustomer(int id)
         {
@@ -78,11 +82,54 @@ namespace Betazon.Controllers
            
         }
 
+        // GET: api/Customers/Products/email
+        
+        [HttpGet("Products/{email}")]
+        public async Task<ActionResult<IEnumerable<Product>>> GetProducts(string email)
+        {
+            List<Product> products=new List<Product>();
+
+            if (_context.Customers == null)
+            {
+                return NotFound();
+            }
+            using (var context = _context)
+            {
+                var customer = await context.Customers
+                   .AsNoTracking()
+                   .Where(customer => customer.EmailAddress == email && customer.SalesOrderHeaders.Count != 0)
+                   .Include(customer => customer.SalesOrderHeaders)
+                   .ThenInclude(salesOrderHeaders => salesOrderHeaders.SalesOrderDetails)
+                   .ThenInclude(salesOrderDetails => salesOrderDetails.Product)
+                   .FirstOrDefaultAsync();
+                   
+
+                if (customer == null)
+                {
+                    return NotFound();
+                }
+
+                foreach(SalesOrderHeader salesOrderHeader in customer.SalesOrderHeaders)
+                {
+                    foreach(SalesOrderDetail salesOrderDetail in salesOrderHeader.SalesOrderDetails)
+                    {
+                        products.Add(salesOrderDetail.Product);
+                    }
+                }
+
+                return products;
+            }
+
+        }
+
         // PUT: api/Customers/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> PutCustomer(int id, Customer customer)
         {
+            using var transaction = _context.Database.BeginTransaction();
+
             if (id != customer.CustomerId)
             {
                 return BadRequest();
@@ -93,9 +140,13 @@ namespace Betazon.Controllers
             try
             {
                 await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
+                _context.ErrorLogs.FromSql($"uspLogError {0}");
+                transaction.Rollback();
+
                 if (!CustomerExists(id))
                 {
                     return NotFound();
@@ -126,6 +177,7 @@ namespace Betazon.Controllers
                 customer.PasswordHash = _encrypt.Hash(customer.PasswordHash, customer.PasswordSalt);
 
                 _context.Customers.Add(customer);
+                
                 await _context.SaveChangesAsync();
                 await transaction.CommitAsync();
                 return CreatedAtAction("GetCustomer", new { id = customer.CustomerId }, customer);
@@ -141,22 +193,34 @@ namespace Betazon.Controllers
 
         // DELETE: api/Customers/5
         [HttpDelete("{id}")]
+        [Authorize]
         public async Task<IActionResult> DeleteCustomer(int id)
         {
-            if (_context.Customers == null)
-            {
-                return NotFound();
-            }
-            var customer = await _context.Customers.FindAsync(id);
-            if (customer == null)
-            {
-                return NotFound();
-            }
+            using var transaction = _context.Database.BeginTransaction();
 
-            _context.Customers.Remove(customer);
-            await _context.SaveChangesAsync();
+            try
+            {
+                if (_context.Customers == null)
+                {
+                    return NotFound();
+                }
+                var customer = await _context.Customers.FindAsync(id);
+                if (customer == null)
+                {
+                    return NotFound();
+                }
 
-            return NoContent();
+                _context.Customers.Remove(customer);
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+                return NoContent();
+            }
+            catch(Exception e) 
+            {
+                _context.ErrorLogs.FromSql($"uspLogError {0}");
+                transaction.Rollback();
+                return Problem("Error During deletion on Customer table");
+            }
         }
 
         private bool CustomerExists(int id)
